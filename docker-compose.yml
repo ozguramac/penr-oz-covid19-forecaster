@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  penr-oz-covid19-forecaster:
+    image: python:3.7
+    container_name: penr-oz-covid19-forecaster
+    ports:
+    - "5000:5000"
+    working_dir: /code
+    volumes:
+    - ./src/:/code/
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install -r requirements.txt
+        python app.py
+    environment:
+      PYTHONUNBUFFERED: 1
+      FLASK_ENV: development
+    healthcheck:
+      test: wget -q --spider -t 1 http://localhost:5000 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3

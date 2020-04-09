@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Derin Works - Covid-19 Forecaster</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+<h2>COVID-19 Forecaster</h2>
+<form method="POST" action="/forecast">
+    <div class="form-group">
+        <label for="category">Category:</label>
+        <select class="form-control" name="category" id="category" required>
+            {% for cat in categories %}
+            {% if cat == category %}
+            <option value="{{cat}}" selected>{{cat}}</option>
+            {% else %}
+            <option value="{{cat}}">{{cat}}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="key">Filter:</label>
+        <input type="text" class="form-control" name="key" id="key" value="{{key}}"required>
+    </div>
+    <div class="form-group">
+        <label for="num_of_days">Num of days:</label>
+        <input type="number" class="form-control" name="num_of_days" id="num_of_days" min="1" max="10"
+               value="{{num_of_days}}" required>
+    </div>
+    <div class="form-group">
+        <label for="p">Num of autoregressive Terms:</label>
+        <input type="number" class="form-control" name="p" id="p" min="0" max="10" value="{{p}}" required>
+    </div>
+    <div class="form-group">
+        <label for="q">Num of nonseasonal differences:</label>
+        <input type="number" class="form-control" name="q" id="q" min="0" max="10" value="{{q}}" required>
+    </div>
+    <div class="form-group">
+        <label for="d">Num of lagged forecast errors:</label>
+        <input type="number" class="form-control" name="d" id="d" min="0" max="10" value="{{d}}" required>
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+</div>
+{% if plot %}
+<div class="container">
+    <img src="data:image/png;base64,{{plot}}">
+</div>
+{% endif %}
+</body>
+<footer class="page-footer font-small blue">
+    <div class="footer-copyright text-center py-3">© 2020 Copyright:
+        <a href="https://www.derinworksllc.com/"> Derin Works LLC</a>
+    </div>
+</footer>
+</html>
