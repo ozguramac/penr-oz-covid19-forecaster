@@ -8,12 +8,8 @@ services:
     working_dir: /code
     volumes:
     - ./src/:/code/
-    command:
-      - /bin/sh
-      - -c
-      - |
-        pip install -r requirements.txt
-        python app.py
+    - .cache:/root/.cache
+    command: /bin/sh -c 'pip install -r requirements.txt; python app.py'
     environment:
       PYTHONUNBUFFERED: 1
       FLASK_ENV: development
