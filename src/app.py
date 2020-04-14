@@ -13,6 +13,11 @@ app = Flask(__name__)
 categories = ['confirmed_US', 'deaths_US', 'deaths_global', 'recovered_US']
 
 
+@app.route('/liveness')
+def alive():
+    return "OK"
+
+
 @app.route('/')
 def root():
     return render_template("index.html", categories=categories, category=categories[0], key='Massachusetts, US',
