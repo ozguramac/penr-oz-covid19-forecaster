@@ -1,15 +1,16 @@
 version: "3.7"
 services:
   penr-oz-covid19-forecaster:
-    image: python:3.7
+    image: penr-oz-covid19-forecaster
     container_name: penr-oz-covid19-forecaster
+    build: .
     ports:
     - "5000:5000"
     working_dir: /code
     volumes:
     - ./src/:/code/
     - .cache:/root/.cache
-    command: /bin/sh -c 'pip install -r requirements.txt; python app.py'
+    command: python app.py
     environment:
       PYTHONUNBUFFERED: 1
       FLASK_ENV: development
