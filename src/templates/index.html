@@ -54,6 +54,15 @@
     <img src="data:image/png;base64,{{plot}}">
 </div>
 {% endif %}
+
+<div id="forecast-container"></div>
+
+<!-- Load React. -->
+<script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+<!-- Load React component. -->
+<script src="{{ url_for('static', filename='forecast.js') }}"></script>
+
 </body>
 <footer class="page-footer font-small blue">
     <div class="footer-copyright text-center py-3">© 2020 Copyright:
