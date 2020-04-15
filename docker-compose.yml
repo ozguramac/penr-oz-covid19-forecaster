@@ -10,7 +10,8 @@ services:
     volumes:
     - ./src/:/code/
     - .cache:/root/.cache
-    command: python app.py
+    entrypoint: python
+    command: app.py
     environment:
       PYTHONUNBUFFERED: 1
       FLASK_ENV: development
