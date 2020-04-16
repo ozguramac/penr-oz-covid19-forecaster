@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: penr-oz-covid19-forecaster
+  labels:
+    app: penr-oz-covid19-forecaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: penr-oz-covid19-forecaster
+  template:
+    metadata:
+      labels:
+        app: penr-oz-covid19-forecaster
+    spec:
+      containers:
+        - name: penr-oz-covid19-forecaster
+          image: ozguramac/penr-oz-covid19-forecaster
+          ports:
+            - containerPort: 8000
+          workingDir: /code
+          command: ["gunicorn"]
+          args: ["app:app"]
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: FLASK_ENV
+              value: "production"
+            - name: GUNICORN_CMD_ARGS
+              value: "--bind=0.0.0.0"
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: penr-oz-covid19-forecaster
+spec:
+  selector:
+    app: penr-oz-covid19-forecaster
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
