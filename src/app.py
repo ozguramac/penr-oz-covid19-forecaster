@@ -33,6 +33,27 @@ def response():
     q = int(request.form.get("q", "1"))
     d = int(request.form.get("d", "1"))
 
+    plot_data = forecast(category, key, num_of_days, d, p, q)
+
+    return render_template("index.html", categories=categories, category=category, key=key,
+                           num_of_days=num_of_days, p=p, q=q, d=d, plot=plot_data)
+
+
+@app.route('/forecast')
+def get_forecast():
+    category = request.args.get("category", categories[0])
+    key = request.args.get("key", 'Massachusetts, US')
+    num_of_days = int(request.args.get("num_of_days", "3"))
+    p = int(request.args.get("p", "0"))
+    q = int(request.args.get("q", "1"))
+    d = int(request.args.get("d", "1"))
+
+    plot_data = forecast(category, key, num_of_days, d, p, q)
+
+    return plot_data
+
+
+def forecast(category, key, num_of_days, d, p, q):
     df = read_csv(category)
 
     app.logger.info('Aggregating by ' + key)
@@ -55,10 +76,10 @@ def response():
     img = io.BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
+
     plot_data = base64.b64encode(img.getvalue()).decode()
 
-    return render_template("index.html", categories=categories, category=category, key=key,
-                           num_of_days=num_of_days, p=p, q=q, d=d, plot=plot_data)
+    return plot_data
 
 
 @cached(cache=TTLCache(maxsize=1024, ttl=3*60*60))
