@@ -50,19 +50,31 @@
 </form>
 </div>
 {% if plot %}
-<div class="container">
-    <img src="data:image/png;base64,{{plot}}">
-</div>
-{% endif %}
-
-<div id="forecast-container"></div>
+<div class="container" id="forecast-container"></div>
 
 <!-- Load React. -->
 <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
 <!-- Load React component. -->
-<script src="{{ url_for('static', filename='forecast.js') }}"></script>
+<script>
+'use strict';
 
+const e = React.createElement;
+
+class ForecastComponent extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return e('img', {src: "data:image/png;base64,{{plot}}"});
+    }
+}
+
+const domContainer = document.querySelector('#forecast-container');
+ReactDOM.render(e(ForecastComponent), domContainer);
+</script>
+{% endif %}
 </body>
 <footer class="page-footer font-small blue">
     <div class="footer-copyright text-center py-3">© 2020 Copyright:
