@@ -46,7 +46,9 @@
         <label for="d">Num of lagged forecast errors:</label>
         <input type="number" class="form-control" name="d" id="d" min="0" max="10" value="{{d}}" required>
     </div>
-    <button type="submit" class="btn btn-default">Submit</button>
+    {% if not plot %}
+    <button type="submit" class="btn btn-default">Forecast</button>
+    {% endif %}
 </form>
 </div>
 {% if plot %}
@@ -64,10 +66,32 @@ const e = React.createElement;
 class ForecastComponent extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            plot: "{{plot}}"
+        }
+    }
+
+    getPlot() {
+        let cat = document.getElementById('category').value
+        let key = document.getElementById('key').value
+        let days = document.getElementById('num_of_days').value
+        let p = document.getElementById('p').value
+        let q = document.getElementById('q').value
+        let d = document.getElementById('d').value
+        fetch('/forecast?category='+cat+'&key='+key+'&num_of_days='+days+'&p='+p+'&q='+q+'&d='+d)
+        .then(res => res.json())
+        .then((data) => {
+            this.setState(data)
+        })
+        .catch(console.log)
     }
 
     render() {
-        return e('img', {src: "data:image/png;base64,{{plot}}"});
+        let imgSrc = "data:image/png;base64," + this.state.plot
+        return e('div', null,
+            e('img', {src: imgSrc}),
+            e('button', {className: "btn btn-default", onClick: () => this.getPlot()}, 'Refresh'),
+        );
     }
 }
 
