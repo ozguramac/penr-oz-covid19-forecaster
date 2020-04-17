@@ -7,7 +7,7 @@ from cachetools import cached, TTLCache
 
 from statsmodels.tsa.arima_model import ARIMA
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 
 app = Flask(__name__)
 categories = ['confirmed_US', 'deaths_US', 'deaths_global', 'recovered_US']
@@ -42,7 +42,7 @@ def response():
 @app.route('/forecast')
 def get_forecast():
     category = request.args.get("category", categories[0])
-    key = request.args.get("key", 'Massachusetts, US')
+    key = request.args.get("key", 'Massachusetts, US' if category.endswith('_US') else 'Turkey')
     num_of_days = int(request.args.get("num_of_days", "3"))
     p = int(request.args.get("p", "0"))
     q = int(request.args.get("q", "1"))
@@ -50,7 +50,7 @@ def get_forecast():
 
     plot_data = forecast(category, key, num_of_days, d, p, q)
 
-    return plot_data
+    return jsonify({'plot': plot_data})
 
 
 def forecast(category, key, num_of_days, d, p, q):
@@ -75,6 +75,7 @@ def forecast(category, key, num_of_days, d, p, q):
     app.logger.info('Converting plot to png...')
     img = io.BytesIO()
     plt.savefig(img, format='png')
+    plt.close(fig)
     img.seek(0)
 
     plot_data = base64.b64encode(img.getvalue()).decode()
@@ -84,7 +85,7 @@ def forecast(category, key, num_of_days, d, p, q):
 
 @cached(cache=TTLCache(maxsize=1024, ttl=3*60*60))
 def read_csv(cat: str) -> pd.DataFrame:
-    base_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/'
+    base_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master'
     url = base_url + '/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_' + cat + '.csv'
     idx = 'Combined_Key' if cat.endswith('_US') else 'Country/Region'
     app.logger.info('Reading CSV from ' + url + " and indexing on " + idx)
