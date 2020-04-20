@@ -79,7 +79,15 @@ class ForecastComponent extends React.Component {
         let q = document.getElementById('q').value
         let d = document.getElementById('d').value
         fetch('/forecast?category='+cat+'&key='+key+'&num_of_days='+days+'&p='+p+'&q='+q+'&d='+d)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                if (res.status === 404) {
+                    window.alert(key + ' => ' + res.statusText)
+                }
+                throw Error(res.statusText);
+            }
+            return res.json()
+        })
         .then((data) => {
             this.setState(data)
         })
