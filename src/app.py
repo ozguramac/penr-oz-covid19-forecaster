@@ -60,11 +60,19 @@ def get_forecast():
 def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
     df = read_csv(category)
 
-    app.logger.info('Aggregating by ' + key)
-    krs = [k for k in df.index if key in k]
-    if len(krs) < 1:
-        return None
-    dr = df.loc[krs, df.columns[11:]].sum()
+    if category.endswith('_global') and ',' in key:
+        key = tuple([k.strip() for k in key.split(',')])
+
+    if key:
+        app.logger.info('Aggregating {} by {}'.format(category, str(key)))
+        krs = [k for k in df.index if key == k or key in k]
+        app.logger.info('Found key(s): ' + str(krs))
+        if len(krs) < 1:
+            return None
+        dr = df.loc[krs, df.columns[11:]].sum()
+    else:
+        app.logger.info('Aggregating ' + category)
+        dr = df[df.columns[11:]].sum()
 
     app.logger.info('Forecasting {} day(s) out using ARIMA with order=({},{},{})'.format(num_of_days, p, q, d))
     model = ARIMA(dr.values, order=(p, q, d))
@@ -75,7 +83,7 @@ def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
     plt.figure(figsize=(10, 10), dpi=100)
     fig, (ax1, ax2) = plt.subplots(2)
     ax1.plot(dr.index[-num_of_days:], dr.values[-num_of_days:], color='tab:red')
-    ax1.set(title='COVID-19 ' + category + ' ' + key, xlabel='dates', ylabel='num of ' + category)
+    ax1.set(title='COVID-19 ' + category + ' ' + str(key), xlabel='dates', ylabel='num of ' + category)
     ax2.plot(range(0, len(yhat)), yhat, color='tab:blue')
     ax2.set(xlabel='days', ylabel=category + ' forecast')
 
@@ -94,8 +102,8 @@ def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
 def read_csv(cat: str) -> pd.DataFrame:
     base_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master'
     url = base_url + '/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_' + cat + '.csv'
-    idx = 'Combined_Key' if cat.endswith('_US') else 'Country/Region'
-    app.logger.info('Reading CSV from ' + url + " and indexing on " + idx)
+    idx = 'Combined_Key' if cat.endswith('_US') else ['Province/State','Country/Region']
+    app.logger.info('Reading CSV from ' + url + " and indexing on " + str(idx))
     return pd.read_csv(url, index_col=idx)
 
 
