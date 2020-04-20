@@ -1,0 +1,25 @@
+name: 'Deploy Penr-oz Covid19 Forecaster'
+on:
+  push:
+    branches: [ master ]
+jobs:
+  deploy:
+    name: 'Deploy to Penr-oz EKS Cluster'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+      - name: 'Publish to Registry'
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ozguramac/penr-oz-covid19-forecaster
+          tags: latest
+#      - name: 'Kube Apply'
+#        uses: steebchen/kubectl@master
+#        with:
+#          args: apply -f kube.yml
+#        env:
+#          KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG }}
+#          KUBECTL_VERSION: "1.18.1"
