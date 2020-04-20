@@ -10,7 +10,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from flask import Flask, request, render_template, jsonify, abort
 
 app = Flask(__name__)
-categories = ['confirmed_US', 'deaths_US', 'deaths_global', 'recovered_global']
+categories = ['confirmed_US', 'confirmed_global', 'deaths_US', 'deaths_global', 'recovered_global']
 
 
 @app.route('/liveness')
