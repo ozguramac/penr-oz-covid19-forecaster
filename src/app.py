@@ -102,11 +102,11 @@ def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
     return plot_data
 
 
-@cached(cache=TTLCache(maxsize=1024, ttl=3*60*60))
+@cached(cache=TTLCache(maxsize=1024, ttl=3 * 60 * 60))
 def read_csv(cat: str) -> pd.DataFrame:
     base_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master'
     url = base_url + '/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_' + cat + '.csv'
-    idx = 'Combined_Key' if cat.endswith('_US') else ['Province/State','Country/Region']
+    idx = 'Combined_Key' if cat.endswith('_US') else ['Province/State', 'Country/Region']
     app.logger.info('Reading CSV from ' + url + " and indexing on " + str(idx))
     return pd.read_csv(url, index_col=idx)
 
