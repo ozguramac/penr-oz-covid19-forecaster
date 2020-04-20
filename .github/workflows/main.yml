@@ -2,6 +2,10 @@ name: 'Deploy Penr-oz Covid19 Forecaster'
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'kube.yml'
 jobs:
   deploy:
     name: 'Deploy to Penr-oz EKS Cluster'
