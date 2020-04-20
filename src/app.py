@@ -66,7 +66,11 @@ def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
     if key:
         app.logger.info('Aggregating {} by {}'.format(category, str(key)))
         krs = [k for k in df.index if key == k or key in k]
-        app.logger.info('Found key(s): ' + str(krs))
+        if len(krs) < 11:
+            app.logger.info('Found key(s): ' + str(krs))
+        else:
+            app.logger.info('Found {} keys: {} ... {}'.format(len(krs), str(krs[:5]).rstrip(']'),
+                                                              str(krs[-5:]).lstrip('[')))
         if len(krs) < 1:
             return None
         dr = df.loc[krs, df.columns[11:]].sum()
