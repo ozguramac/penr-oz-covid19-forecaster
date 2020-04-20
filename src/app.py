@@ -7,7 +7,7 @@ from cachetools import cached, TTLCache
 
 from statsmodels.tsa.arima_model import ARIMA
 
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, abort
 
 app = Flask(__name__)
 categories = ['confirmed_US', 'deaths_US', 'deaths_global', 'recovered_global']
@@ -34,6 +34,8 @@ def response():
     d = int(request.form.get("d", "1"))
 
     plot_data = forecast(category, key, num_of_days, d, p, q)
+    if not plot_data:
+        abort(404)
 
     return render_template("index.html", categories=categories, category=category, key=key,
                            num_of_days=num_of_days, p=p, q=q, d=d, plot=plot_data)
@@ -49,15 +51,20 @@ def get_forecast():
     d = int(request.args.get("d", "1"))
 
     plot_data = forecast(category, key, num_of_days, d, p, q)
+    if not plot_data:
+        abort(404)
 
     return jsonify({'plot': plot_data})
 
 
-def forecast(category, key, num_of_days, d, p, q):
+def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
     df = read_csv(category)
 
     app.logger.info('Aggregating by ' + key)
-    dr = df.loc[[k for k in df.index if key in k], df.columns[11:]].sum()
+    krs = [k for k in df.index if key in k]
+    if len(krs) < 1:
+        return None
+    dr = df.loc[krs, df.columns[11:]].sum()
 
     app.logger.info('Forecasting {} day(s) out using ARIMA with order=({},{},{})'.format(num_of_days, p, q, d))
     model = ARIMA(dr.values, order=(p, q, d))
