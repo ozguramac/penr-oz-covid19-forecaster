@@ -12,7 +12,7 @@
 <body>
 <div class="container">
 <h2>COVID-19 Forecaster</h2>
-<form method="POST" action="/forecast">
+<form method="POST" action="/">
     <div class="form-group">
         <label for="category">Category:</label>
         <select class="form-control" name="category" id="category" required>
@@ -27,7 +27,7 @@
     </div>
     <div class="form-group">
         <label for="key">Filter:</label>
-        <input type="text" class="form-control" name="key" id="key" value="{{key}}"required>
+        <input type="text" class="form-control" name="key" id="key" value="{{key}}">
     </div>
     <div class="form-group">
         <label for="num_of_days">Num of days:</label>
