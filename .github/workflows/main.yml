@@ -6,6 +6,8 @@ on:
       - 'src/**'
       - 'Dockerfile'
       - 'kube.yml'
+    paths-ignore:
+      - 'src/*_test.py'
 jobs:
   deploy:
     name: 'Deploy to Penr-oz EKS Cluster'
