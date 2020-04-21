@@ -41,6 +41,19 @@ $ docker-compose down
 docker-compose ps
 ```
 
+### Testing
+[docker-compose.override.yml](https://docs.docker.com/compose/extends/):
+```
+version: "3.7"
+services:
+  penr-oz-covid19-forecaster:
+    command: app_test.py
+```
+then:
+```
+$ docker-compose up penr-oz-covid19-forecaster
+```
+
 ### Who do I talk to? ###
 * Repo owner or [admin](mailto:info@derinworksllc.com) 
 
