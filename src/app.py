@@ -18,24 +18,25 @@ def alive():
     return "OK"
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def root():
-    return render_template("index.html", categories=categories, category=categories[0], key='Massachusetts, US',
-                           num_of_days=3, p=0, q=1, d=1)
+    if request.method == 'POST':
+        category = request.form.get("category")
+        key = request.form.get("key")
+        num_of_days = int(request.form.get("num_of_days", "3"))
+        p = int(request.form.get("p", "0"))
+        q = int(request.form.get("q", "1"))
+        d = int(request.form.get("d", "1"))
 
-
-@app.route('/forecast', methods=['POST'])
-def response():
-    category = request.form.get("category")
-    key = request.form.get("key")
-    num_of_days = int(request.form.get("num_of_days", "3"))
-    p = int(request.form.get("p", "0"))
-    q = int(request.form.get("q", "1"))
-    d = int(request.form.get("d", "1"))
-
-    plot_data = forecast(category, key, num_of_days, d, p, q)
-    if not plot_data:
-        abort(404)
+        plot_data = forecast(category, key, num_of_days, d, p, q)
+        if not plot_data:
+            abort(404)
+    else:
+        category = categories[0]
+        key = 'Massachusetts, US'
+        num_of_days = 3
+        p, q, d = 0, 1, 1
+        plot_data = None
 
     return render_template("index.html", categories=categories, category=category, key=key,
                            num_of_days=num_of_days, p=p, q=q, d=d, plot=plot_data)
@@ -44,7 +45,7 @@ def response():
 @app.route('/forecast')
 def get_forecast():
     category = request.args.get("category", categories[0])
-    key = request.args.get("key", 'Massachusetts, US' if category.endswith('_US') else 'Turkey')
+    key = request.args.get("key")
     num_of_days = int(request.args.get("num_of_days", "3"))
     p = int(request.args.get("p", "0"))
     q = int(request.args.get("q", "1"))
@@ -66,17 +67,17 @@ def forecast(category: str, key: str, num_of_days: int, d: int, p: int, q: int):
     if key:
         app.logger.info('Aggregating {} by {}'.format(category, str(key)))
         krs = [k for k in df.index if key == k or key in k]
-        if len(krs) < 11:
-            app.logger.info('Found key(s): ' + str(krs))
-        else:
-            app.logger.info('Found {} keys: {} ... {}'.format(len(krs), str(krs[:5]).rstrip(']'),
-                                                              str(krs[-5:]).lstrip('[')))
         if len(krs) < 1:
+            app.logger.info(str(key) + ' not found in keys!')
             return None
-        dr = df.loc[krs, df.columns[11:]].sum()
+        mid = min(len(krs) // 2, 5)
+        app.logger.info('Found {} key(s): {}{}{}'.format(len(krs), str(krs[:mid]).rstrip(']'),
+                                                         ',..,' if len(krs) > 11 else ',',
+                                                         str(krs[-mid:]).lstrip('[')))
+        dr = df.loc[krs, df.columns[12:]].sum()
     else:
         app.logger.info('Aggregating ' + category)
-        dr = df[df.columns[11:]].sum()
+        dr = df[df.columns[12:]].sum()
 
     app.logger.info('Forecasting {} day(s) out using ARIMA with order=({},{},{})'.format(num_of_days, p, q, d))
     model = ARIMA(dr.values, order=(p, q, d))
