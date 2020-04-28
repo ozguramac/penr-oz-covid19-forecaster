@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+  penr-oz-covid19-forecaster:
+    image: ozguramac/penr-oz-covid19-forecaster
+    container_name: penr-oz-covid19-forecaster
+    entrypoint: gunicorn
+    command: app:app
+    environment:
+      PYTHONUNBUFFERED: 1
+      FLASK_ENV: production
+      GUNICORN_CMD_ARGS: --bind=0.0.0.0
+    healthcheck:
+      test: wget -q --spider -t 1 http://localhost:8000/liveness || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  proxy:
+    container_name: proxy-for-covid19-forecaster
+    image: nginx:1.17.10-alpine
+    healthcheck:
+      test: wget -q --spider http://localhost/healthz || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - wellknown:/usr/share/nginx/html/.well-known
+      - ssldir:/etc/ssl/live:ro
+      - sslarchive:/etc/ssl/archive:ro
+      - sslrenew:/etc/ssl/renewal:ro
+    depends_on:
+      - penr-oz-covid19-forecaster
+
+volumes:
+  wellknown:
+  ssldir:
+  sslarchive:
+  sslrenew:

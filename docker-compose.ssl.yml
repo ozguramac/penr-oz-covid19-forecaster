@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  sslbot:
+    container_name: sslbot
+    image: certbot/certbot
+    working_dir: /etc/letsencrypt
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+          rm -f renewal/covid19.derinworksllc.com.conf
+          (cd archive && mv covid19.derinworksllc.com expired_$$(date '+%Y%m%d'))
+          (cd live && mv covid19.derinworksllc.com expired_$$(date '+%Y%m%d'))
+          certbot certonly -m ${SITE_EMAIL} --agree-tos -d covid19.derinworksllc.com -v -n --webroot -w www
+    volumes:
+    - wellknown:/etc/letsencrypt/www/.well-known
+    - ssldir:/etc/letsencrypt/live
+    - sslarchive:/etc/letsencrypt/archive
+    - sslrenew:/etc/letsencrypt/renewal
+volumes:
+  wellknown:
+  ssldir:
+  sslarchive:
+  sslrenew:
