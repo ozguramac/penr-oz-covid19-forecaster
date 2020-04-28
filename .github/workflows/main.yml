@@ -6,7 +6,7 @@ on:
       - 'src/**'
       - '!src/*_test.py'
       - 'Dockerfile'
-      - 'kube.yml'
+#      - 'kube.yml'
 jobs:
   deploy:
     name: 'Deploy to Penr-oz EKS Cluster'
