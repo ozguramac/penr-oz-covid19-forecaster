@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: penr-oz-covid19-forecaster
+  name: penroz-covid19-forecaster
   labels:
-    app: penr-oz-covid19-forecaster
+    app: penroz-covid19-forecaster
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: penr-oz-covid19-forecaster
+      app: penroz-covid19-forecaster
   template:
     metadata:
       labels:
-        app: penr-oz-covid19-forecaster
+        app: penroz-covid19-forecaster
     spec:
       containers:
-        - name: penr-oz-covid19-forecaster
+        - name: penroz-covid19-forecaster
           image: ozguramac/penr-oz-covid19-forecaster
           ports:
             - containerPort: 8000
@@ -40,11 +40,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: penr-oz-covid19-forecaster
+  name: penroz-covid19-forecaster
 spec:
   selector:
-    app: penr-oz-covid19-forecaster
+    app: penroz-covid19-forecaster
   ports:
     - protocol: TCP
-      port: 80
+      port: 8000
       targetPort: 8000
